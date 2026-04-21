@@ -31,6 +31,19 @@ def clean_hist(h, days=30):
     cut = (datetime.now()-timedelta(days=days)).strftime("%Y-%m-%d")
     return {k:v for k,v in h.items() if v.get("pushed_at","")[:10]>=cut}
 
+HEADERS = {
+    "Content-Type": "application/json",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    "Accept": "application/json, text/javascript, */*; q=0.01",
+    "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+    "Origin": "https://www.cqggzy.com",
+    "Referer": "https://www.cqggzy.com/xxhz/014001/014001001/transaction_detail.html",
+    "X-Requested-With": "XMLHttpRequest",
+    "Sec-Fetch-Dest": "empty",
+    "Sec-Fetch-Mode": "cors",
+    "Sec-Fetch-Site": "same-origin",
+}
+
 def fetch(cat_code, sd, ed):
     param = {"token":"","pn":0,"rn":MAX_RECORDS,"sdt":"","edt":"","wd":"","inc_wd":"","exc_wd":"",
         "fields":"","cnum":"001","sort":'{"istop":"0","ordernum":"0","webdate":"0","newid":"0"}',
@@ -40,8 +53,7 @@ def fetch(cat_code, sd, ed):
         "time":[{"fieldName":"webdate","startTime":f"{sd} 00:00:00","endTime":f"{ed} 23:59:59"}],
         "highlights":"","statistics":None,"unionCondition":None,"accuracy":"","noParticiple":"1","searchRange":None,"noWd":True}
     try:
-        r = requests.post(API_URL, json=param, headers={"Content-Type":"application/json",
-            "User-Agent":"Mozilla/5.0","Referer":"https://www.cqggzy.com/xxhz/014001/014001001/transaction_detail.html"}, timeout=15)
+        r = requests.post(API_URL, json=param, headers=HEADERS, timeout=15)
         r.raise_for_status(); d = r.json()
         if d.get("code")!=200: return []
         c = d.get("content","")
